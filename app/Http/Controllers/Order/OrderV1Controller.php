@@ -11,6 +11,7 @@ use App\Models\Ebook\Ebook;
 use App\Models\Order\Order;
 use App\Models\Order\OrderDetail;
 use App\Models\User;
+use App\Services\Payment\PaymentService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -111,6 +112,7 @@ final class OrderV1Controller extends Controller
      */
     private function executePayment(Order $order): void
     {
-        // 外部決済サービスのAPIを実行する処理を記述する
+        $data = [];
+        (new PaymentService)->execute($data);
     }
 }

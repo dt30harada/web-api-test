@@ -9,6 +9,7 @@ use App\Models\Ebook\Ebook;
 use App\Models\Order\Order;
 use App\Models\Order\OrderDetail;
 use App\Models\User;
+use App\Services\Payment\PaymentServiceInterface;
 use Database\Seeders\EbookFormatSeeder;
 use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,6 +29,7 @@ final class PlaceOrderV2Test extends TestCase
     public function 正常に注文を処理できる(): void
     {
         // arrange
+        $paymentServiceSpy = $this->spy(PaymentServiceInterface::class);
         Mail::fake();
         $this->travelTo(new DateTime('2023-12-05'));
         $this->seed(EbookFormatSeeder::class);
@@ -65,6 +67,7 @@ final class PlaceOrderV2Test extends TestCase
             'order_id' => $response->json('orderId'),
             'price' => 2000,
         ]);
+        $paymentServiceSpy->shouldHaveReceived('execute')->once()->with([]);
         Mail::assertSent(OrderPlaced::class, function ($mail) use ($response) {
             return $mail->hasTo('a@a.test')
                 && $mail->hasSubject('注文完了のお知らせ')

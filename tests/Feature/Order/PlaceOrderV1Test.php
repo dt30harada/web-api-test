@@ -9,10 +9,12 @@ use App\Models\Ebook\Ebook;
 use App\Models\Order\Order;
 use App\Models\Order\OrderDetail;
 use App\Models\User;
+// use App\Services\Payment\PaymentService;
 use Database\Seeders\EbookFormatSeeder;
 use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+// use Mockery;
 use Tests\TestCase;
 
 /**
@@ -30,6 +32,10 @@ final class PlaceOrderV1Test extends TestCase
     public function 正常に注文を処理できる(string $today, bool $discount): void
     {
         // arrange
+        // [強い依存のモック](https://readouble.com/mockery/1.0/ja/mocking_hard_dependencies.html)
+        // これを実行すると、後続のテストに影響が出る可能性がある
+        // $paymentServiceMock = Mockery::mock('overload:'.PaymentService::class);
+        // $paymentServiceMock->shouldReceive('execute')->once()->with([]);
         Mail::fake();
         $this->travelTo(new DateTime($today));
         $this->seed(EbookFormatSeeder::class);
