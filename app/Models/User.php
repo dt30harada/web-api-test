@@ -54,4 +54,18 @@ final class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * 指定の電子書籍を過去に注文したことがあるか確認する
+     */
+    public function checkIfAlreadyOrdered(array $ebookIds): bool
+    {
+        return $this
+            ->orders()
+            ->whereHas('orderDetails', function ($query) use ($ebookIds) {
+                $query->whereIn('ebook_id', $ebookIds);
+            })
+            ->lockForUpdate()
+            ->exists();
+    }
 }

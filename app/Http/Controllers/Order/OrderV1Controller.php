@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Order;
 
 use App\Exceptions\Order\AlreadyOrderedException;
+use App\Http\Controllers\Controller;
 use App\Mail\Order\OrderPlaced;
 use App\Models\Ebook\Ebook;
 use App\Models\Order\Order;
@@ -17,9 +18,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 /**
- * 電子書籍の注文を扱うコントローラ
+ * 電子書籍の注文を扱うコントローラ リファクタリング前
  */
-final class OrderController extends Controller
+final class OrderV1Controller extends Controller
 {
     /**
      * 注文処理

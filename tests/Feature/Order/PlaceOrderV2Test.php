@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 /**
- * 注文処理のHTTPテスト
+ * 注文処理のHTTPテスト リファクタリング後
  */
-final class PlaceOrderTest extends TestCase
+final class PlaceOrderV2Test extends TestCase
 {
     use RefreshDatabase;
 
@@ -42,7 +42,7 @@ final class PlaceOrderTest extends TestCase
         )->create();
 
         // act
-        $response = $this->actingAs($user)->postJson('/api/orders', [
+        $response = $this->actingAs($user)->postJson('api/v2/orders', [
             'ebookIds' => $ebooks->pluck('id')->toArray(),
         ]);
 
@@ -125,7 +125,7 @@ final class PlaceOrderTest extends TestCase
         Mail::fake();
 
         // act
-        $response = $this->postJson('/api/orders', [
+        $response = $this->postJson('api/v2/orders', [
             'ebookIds' => [1],
         ]);
 
@@ -144,7 +144,7 @@ final class PlaceOrderTest extends TestCase
         $user = User::factory()->create();
 
         // act
-        $response = $this->actingAs($user)->postJson('/api/orders', [
+        $response = $this->actingAs($user)->postJson('api/v2/orders', [
             'ebookIds' => 'not an array',
         ]);
 
@@ -180,7 +180,7 @@ final class PlaceOrderTest extends TestCase
             ]);
 
         // act
-        $response = $this->actingAs($user)->postJson('/api/orders', [
+        $response = $this->actingAs($user)->postJson('api/v2/orders', [
             'ebookIds' => [$ebook->id],
         ]);
 
