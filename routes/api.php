@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+    // ログインユーザー情報
+    Route::get('user', fn (Request $request) => $request->user());
+
+    Route::prefix('orders')->group(function () {
+        // 注文処理
+        Route::post('', [OrderController::class, 'placeOrder']);
+    });
 });
