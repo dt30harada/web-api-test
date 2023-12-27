@@ -1,66 +1,125 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 2023-12-28 DT勉強会
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## テーマ
 
-## About Laravel
+LaravelでWebAPIの単体・統合テストをゆるく学ぶ
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 参考資料
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [単体テストの考え方/使い方](https://book.mynavi.jp/ec/products/detail/id=134252)
+  - この本を紹介することが本発表のメイン
+  - 以下、「参考書」と省略する
+- [PHPフレームワークLaravel Webアプリケーション開発](https://www.socym.co.jp/book/1300)
+  - テストしやすくなる設計の考え方や、テスト駆動開発の導入が載っている
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 参考書の要約
 
-## Learning Laravel
+### 単体テストを行う目的
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+ソフトウェア開発プロジェクトの成長を持続可能なものにするため。
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+ただテストを書くのではなく、費用対効果の高いテストを書く。
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 「良い単体テストを構成する4本の柱」
 
-## Laravel Sponsors
+- 退行に対する保護
+- リファクタリングへの耐性
+- 迅速なフィードバック
+- 保守のしやすさ
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 単体の解釈
 
-### Premium Partners
+立場により単体の解釈も、テストダブルの使い方も異なる。
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+||隔離対象|単体の意味|テストダブルの置き換え対象|
+|---|---|---|---|
+ロンドン学派|単体|1つのクラス|不変依存を除く全ての依存
+古典学派|テストケース|1つの振る舞い|共有依存
 
-## Contributing
+参考書は古典学派の立場。  
+リファクタリング耐性を重視する傾向。  
+実装の詳細から距離を置くことで偽陽性(プロダクションコードには問題がないのに、テストが失敗する状態)を防ぐ。  
+偽陽性が多いと、テストの信頼度が低下し、テストが保守されなくなってしまう。
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### テストの分類
 
-## Code of Conduct
+#### テストピラミッド
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+参考: <https://martinfowler.com/bliki/TestPyramid.html>
 
-## Security Vulnerabilities
+※ 参考書には記載されていないが、テストサイズによる分類もある  
+<https://zenn.dev/jyoppomu/articles/52844385940140>
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### ソースコードを4つに分ける
 
-## License
+||協力者オブジェクトの数 少ない|協力者オブジェクトの数 多い|
+|---|---|---|
+コードの複雑さ<br>ドメインにおける重要性 高い|ドメイン・モデル<br>アルゴリズム|過度に複雑なコード|
+コードの複雑さ<br>ドメインにおける重要性 低い|取るに足らないコード|コントローラ|
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- ドメインモデルまたは複雑なアルゴリズムは単体テスト
+- コントローラ（ユースケース）は統合テスト
+- 過度に複雑なコードは、ドメインとコントローラに分割する
+  - 「質素なオブジェクト」パターン
+    - 過度に複雑なコードから、単体テストすべき重要な処理を抽出する
+    - コントローラ（質素なオブジェクト）を用意し、重要な処理とその他を連携させる
+- 取るに足りないコードは、テストすべきでない
+
+### テストダブルの分類
+
+テストダブル（依存オブジェクトの代役）は大きく分けると、スタブかモックの2つ。
+
+|種類|特徴|用途|
+|---|---|---|
+|スタブ|メソッドの戻り値を指定できる|依存からSUTへ向かう入力を模倣する<br>例:外部API経由でデータを取得する依存の代役|
+|モック|メソッドの戻り値を指定できる<br>メソッドとのやりとりを検証できる|SUTから依存へ向かう出力を模倣し検証する<br>例:メールを送信する依存の代役|
+
+## サンプルアプリケーション
+
+電子書籍販売サイト(SPA)で使用される想定のWebAPI
+
+### 仕様
+
+- ユーザーは電子書籍を複数選択して注文できる
+- 過去に注文した電子書籍を再度注文することはできない
+- 消費税は考慮しない
+- 毎月5がつく日は小計から5%割引するセールがある
+- 注文処理が完了したら、通知のメールがユーザーに送信される
+
+### 環境構築
+
+[Laravel Sail](https://readouble.com/laravel/10.x/ja/sail.html)を使用するため、Docker Desktopをインストールしておく。
+
+```bash
+# ローカルに落として、プロジェクトルートに移動
+git clone git@github.com:dt30harada/web-api-test.git
+cd web-api-test
+
+# 依存パッケージのインストール
+export DOCKER_CONTENT_TRUST=0
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php82-composer:latest \
+    composer install --ignore-platform-reqs
+export DOCKER_CONTENT_TRUST=1
+
+# .envを用意する
+cp .env.example .env
+
+# Sailを起動
+./vendor/bin/sail up -d
+
+# キーを生成
+./vendor/bin/sail artisan key:generate
+
+# DBのセットアップ
+./vendor/bin/sail artisan migrate --seed
+
+# テストを実行する
+./vendor/bin/sail test
+
+# Sailを停止してコンテナを削除する
+./vendor/bin/sail down
+```
