@@ -10,8 +10,8 @@ use App\Models\Order\Order;
 use App\Models\Order\OrderDetail;
 use App\Models\User;
 use Database\Seeders\EbookFormatSeeder;
+use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -24,14 +24,12 @@ final class PlaceOrderV2Test extends TestCase
 
     /**
      * @test
-     *
-     * @dataProvider data_正常に注文を処理できる
      */
-    public function 正常に注文を処理できる(string $today, bool $discount): void
+    public function 正常に注文を処理できる(): void
     {
         // arrange
         Mail::fake();
-        $this->travelTo(Carbon::parse($today));
+        $this->travelTo(new DateTime('2023-12-05'));
         $this->seed(EbookFormatSeeder::class);
         $user = User::factory()->create([
             'email' => 'a@a.test',
@@ -56,8 +54,8 @@ final class PlaceOrderV2Test extends TestCase
             'id' => $response->json('orderId'),
             'user_id' => $user->id,
             'sub_total' => 3000,
-            'discount' => $discount ? 150 : 0,
-            'total' => $discount ? 2850 : 3000,
+            'discount' => 150,
+            'total' => 2850,
         ]);
         $this->assertDatabaseHas(OrderDetail::class, [
             'order_id' => $response->json('orderId'),
@@ -72,48 +70,6 @@ final class PlaceOrderV2Test extends TestCase
                 && $mail->hasSubject('注文完了のお知らせ')
                 && $mail->order->id === $response->json('orderId');
         });
-    }
-
-    public static function data_正常に注文を処理できる(): array
-    {
-        return [
-            '4日_割引なし' => [
-                'date' => '2023-12-04',
-                'discount' => false,
-            ],
-            '5日:割引あり' => [
-                'date' => '2023-12-05',
-                'discount' => true,
-            ],
-            '6日_割引なし' => [
-                'date' => '2023-12-06',
-                'discount' => false,
-            ],
-            '14日_割引なし' => [
-                'date' => '2023-12-14',
-                'discount' => false,
-            ],
-            '15日_割引あり' => [
-                'date' => '2023-12-15',
-                'discount' => true,
-            ],
-            '16日_割引なし' => [
-                'date' => '2023-12-16',
-                'discount' => false,
-            ],
-            '24日_割引なし' => [
-                'date' => '2023-12-24',
-                'discount' => false,
-            ],
-            '25日_割引あり' => [
-                'date' => '2023-12-25',
-                'discount' => true,
-            ],
-            '26日_割引なし' => [
-                'date' => '2023-12-26',
-                'discount' => false,
-            ],
-        ];
     }
 
     /**

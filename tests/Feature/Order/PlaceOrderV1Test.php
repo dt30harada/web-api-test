@@ -10,8 +10,8 @@ use App\Models\Order\Order;
 use App\Models\Order\OrderDetail;
 use App\Models\User;
 use Database\Seeders\EbookFormatSeeder;
+use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -31,7 +31,7 @@ final class PlaceOrderV1Test extends TestCase
     {
         // arrange
         Mail::fake();
-        $this->travelTo(Carbon::parse($today));
+        $this->travelTo(new DateTime($today));
         $this->seed(EbookFormatSeeder::class);
         $user = User::factory()->create([
             'email' => 'a@a.test',
