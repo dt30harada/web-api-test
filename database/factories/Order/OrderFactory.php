@@ -28,7 +28,9 @@ class OrderFactory extends Factory
 
         return [
             'user_id' => $this->faker->randomElement(self::$userIds),
-            'total_price' => $this->faker->numberBetween(1000, 10000),
+            'sub_total' => $this->faker->numberBetween(1000, 10000),
+            'discount' => $this->faker->numberBetween(0, 500),
+            'total' => fn ($attributes) => $attributes['sub_total'] - $attributes['discount'],
         ];
     }
 }

@@ -21,7 +21,6 @@ return new class extends Migration
                 ->restrictOnDelete();
             $table->string('ebook_title', 100);
             $table->unsignedInteger('price');
-            $table->unsignedInteger('discount')->default(0);
             $table->datetimes();
         });
     }

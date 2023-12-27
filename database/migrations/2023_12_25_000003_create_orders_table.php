@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->constrained()
                 ->cascadeOnDelete();
-            $table->unsignedInteger('total_price');
+            $table->unsignedInteger('sub_total');
+            $table->unsignedInteger('discount')->default(0);
+            $table->unsignedInteger('total');
             $table->datetimes();
         });
     }

@@ -23,7 +23,6 @@ class OrderDetailFactory extends Factory
             'ebook_id' => Ebook::factory(),
             'ebook_title' => fn (array $attributes) => Ebook::find($attributes['ebook_id'])->title,
             'price' => fn (array $attributes) => Ebook::find($attributes['ebook_id'])->price,
-            'discount' => $this->faker->numberBetween(100, 500),
         ];
     }
 }

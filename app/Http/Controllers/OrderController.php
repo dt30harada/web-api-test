@@ -12,9 +12,13 @@ use App\Models\Order\OrderDetail;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * 電子書籍の注文を扱うコントローラ
+ */
 final class OrderController extends Controller
 {
     /**
@@ -26,11 +30,11 @@ final class OrderController extends Controller
     {
         // バリデーション
         $request->validate([
-            'ebookIds' => 'required|array|exists:ebooks,id',
+            'ebookIds' => 'required|array|max:100|exists:ebooks,id',
         ]);
 
         /** @var int[] $ebookIds */
-        $ebookIds = $request->input('ebookIds');
+        $ebookIds = array_unique($request->input('ebookIds'));
         /** @var User $user */
         $user = $request->user();
 
@@ -49,7 +53,8 @@ final class OrderController extends Controller
             }
 
             // 注文詳細を作成
-            $totalPrice = 0;
+            $subTotal = 0;
+            $discount = 0;
             $orderDetails = [];
             $ebooks = Ebook::find($ebookIds);
             foreach ($ebooks as $ebook) {
@@ -60,12 +65,21 @@ final class OrderController extends Controller
                     'price' => $ebook->price,
                 ]);
                 $orderDetails[] = $orderDetail;
-                $totalPrice += $orderDetail->price;
+                $subTotal += $orderDetail->price;
+            }
+
+            // 5がつく日は5%引
+            if (str_contains((string) Carbon::now()->day, '5')) {
+                $discount = (int) ($subTotal * 0.05);
             }
 
             // 注文を保存
             $order = new Order;
-            $order->total_price = $totalPrice;
+            $order->fill([
+                'sub_total' => $subTotal,
+                'discount' => $discount,
+                'total' => $subTotal - $discount,
+            ]);
             $user->orders()->save($order);
 
             // 注文詳細を保存
@@ -83,7 +97,7 @@ final class OrderController extends Controller
         Mail::to($request->user())->send(new OrderPlaced($order));
 
         return response()->json([
-            'order_id' => $order->id,
+            'orderId' => $order->id,
         ]);
     }
 
